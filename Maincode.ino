@@ -85,5 +85,17 @@ void loop() {
     adxl.getEvent(&evt);
     z_val = (0.2 * evt.acceleration.z) + (0.8 * z_val);
     if(z_val > mx) mx = z_val;
-    
+    if(z_val < mn) mn = z_val;
+    if(millis() -timer2 > 800) {
+      timer2 = millis();
+      float disp = ((mx - mn) * 9.81/2180052) * 1000000.0;
+      Serial.print("p: ");
+      Serial.print(pwr);
+      Serial.print("d: "); Serial.println(disp);
+      if(isUp) pwr++;
+      else pwr--;
+      mx = -100;
+      mn = 100;
+
+    }
   }
