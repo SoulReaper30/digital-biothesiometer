@@ -4,8 +4,7 @@
 #include <Adafruit_ADXL345_U.h>
 int m1 = 9;
 int m2 = 10;
-// int freq = 235;
-// long interval = 2127;
+
 
 int pwr = 40;
 int max_m = 55;
