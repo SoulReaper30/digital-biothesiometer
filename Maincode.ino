@@ -12,7 +12,7 @@ unsigned long timer1 = 0;
 unsigned long timer2 = 0;
 int state = 0;
 bool running = false;
-int res[5]
+int res[5];
 int step_count = 0;
 bool isUp = true;
 
@@ -34,16 +34,16 @@ void setup() {
   adxl.begin();
   adxl.setRange(ADXL345_RANGE_2_G);
   pinMode(m1, OUTPUT);
-  pinMode(m1, OUTPUT);
+  pinMode(m2, OUTPUT);
   Serial.println("ready");
 }
 void loop() {
   
-  // motor codee
-  if (running == true) {
-    if (micros() - timer1 > 2127) { // 2127 is for 235hz
+
+  if (running) {
+    if (micros() - timer1 > 2127) { 
       timer1 = micros();
-      if(state == 0) {
+      if (state == 0) {
         analogWrite(m1, pwr);
         analogWrite(m2, 0);
         state = 1;
@@ -53,7 +53,12 @@ void loop() {
         state = 0;
       }
     }
-  }
+    if (step_count >= 5) {
+      running = false;
+      analogWrite(m1, 0);
+      analogWrite(m2, 0);
+      }
+    }
   if (Serial.available()) {
     char c = Serial.read();
     
