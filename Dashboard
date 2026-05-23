@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPT Biothesiometer - Clinical Dashboard</title>
+    <meta name="description"
+        content="Professional diagnostic dashboard for Vibration Perception Threshold testing using a biothesiometer device">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deepspace: #050510;
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #0f0f2a;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-card-hover: rgba(255, 255, 255, 0.055);
+            --border-soft: rgba(255, 255, 255, 0.06);
+            --border-mid: rgba(255, 255, 255, 0.1);
+            --text-primary: #eaeaf5;
+            --text-secondary: #6e6e96;
+            --text-muted: #4a4a6e;
+
+            --normal: #00e676;
+            --normal-soft: rgba(0, 230, 118, 0.12);
+            --normal-glow: rgba(0, 230, 118, 0.3);
+            --risk: #ffab00;
+            --risk-soft: rgba(255, 171, 0, 0.12);
+            --risk-glow: rgba(255, 171, 0, 0.3);
+            --danger: #ff1744;
+            --danger-soft: rgba(255, 23, 68, 0.12);
+            --danger-glow: rgba(255, 23, 68, 0.3);
+
+            --accent-blue: #448aff;
+            --accent-purple: #7c4dff;
+            --accent-cyan: #00e5ff;
+            --accent-gradient: linear-gradient(135deg, #448aff, #7c4dff);
+            --accent-glow: rgba(68, 138, 255, 0.25);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deepspace);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(68, 138, 255, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(124, 77, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 229, 255, 0.02) 0%, transparent 40%);
+            z-index: 0;
+            pointer-events: none;
+            animation: ambientShift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes ambientShift {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-2%, -2%) rotate(3deg);
+            }
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: rgba(5, 5, 16, 0.85);
+            backdrop-filter: blur(24px) saturate(1.4);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .brand-text h1 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            margin-top: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .unit-badge {
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: rgba(0, 229, 255, 0.08);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            letter-spacing: 0.8px;
+        }
+
+        .mode-select {
+            background: rgba(0, 229, 255, 0.08);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+            letter-spacing: 0.8px;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align: center;
+        }
+
+        .mode-select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .connect-btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--accent-gradient);
+            color: white;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 16px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .connect-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .connect-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px var(--accent-glow);
+        }
+
+        .connect-btn.connected {
+            background: linear-gradient(135deg, var(--normal), #00c853);
+            box-shadow: 0 4px 16px var(--normal-glow);
+        }
+
+        .connect-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 32px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-soft);
+            background: rgba(5, 5, 16, 0.5);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--danger);
+            transition: all 0.4s;
+            flex-shrink: 0;
+        }
+
+        .status-dot.connected {
+            background: var(--normal);
+            box-shadow: 0 0 8px var(--normal-glow);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 4px var(--normal-glow);
+            }
+
+            50% {
+                box-shadow: 0 0 12px var(--normal-glow), 0 0 20px rgba(0, 230, 118, 0.15);
+            }
+        }
+
+        .main {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 28px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 20px 24px;
+            backdrop-filter: blur(12px);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-mid);
+        }
+
+        .card-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .zone-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-soft);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+        }
+
+        .zone-banner .zone-icon {
+            font-size: 1.3rem;
+        }
+
+        .zone-banner .zone-label {
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        .zone-banner.normal {
+            background: var(--normal-soft);
+            border-color: rgba(0, 230, 118, 0.2);
+            color: var(--normal);
+        }
+
+        .zone-banner.risk {
+            background: var(--risk-soft);
+            border-color: rgba(255, 171, 0, 0.2);
+            color: var(--risk);
+            animation: zone-pulse-risk 2s ease-in-out infinite;
+        }
+
+        .zone-banner.danger {
+            background: var(--danger-soft);
+            border-color: rgba(255, 23, 68, 0.2);
+            color: var(--danger);
+            animation: zone-pulse-danger 1.5s ease-in-out infinite;
+        }
+
+        @keyframes zone-pulse-risk {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 171, 0, 0);
+            }
+
+            50% {
+                box-shadow: 0 0 20px 2px rgba(255, 171, 0, 0.1);
+            }
+        }
+
+        @keyframes zone-pulse-danger {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 23, 68, 0);
+            }
+
+            50% {
+                box-shadow: 0 0 24px 4px rgba(255, 23, 68, 0.12);
+            }
+        }
+
+        .start-row {
+            margin-bottom: 20px;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            background: var(--accent-gradient);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 1px;
+            box-shadow: 0 6px 24px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.5s;
+        }
+
+        .start-btn:hover::before {
+            left: 100%;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 36px var(--accent-glow);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 22px 16px;
+        }
+
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            line-height: 1;
+            margin-bottom: 6px;
+            transition: color 0.4s;
+        }
+
+        .stat-unit {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .stat-value.gradient {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-value.cyan {
+            color: var(--accent-cyan);
+        }
+
+        .stat-value.purple {
+            color: var(--accent-purple);
+        }
+
+        .rev-progress {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .rev-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--border-mid);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .rev-dot.filled {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 14px rgba(124, 77, 255, 0.6);
+            transform: scale(1.15);
+        }
+
+        .rev-dot.filled::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            animation: rev-ring 1.5s ease-out forwards;
+        }
+
+        @keyframes rev-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .ref-scale {
+            display: flex;
+            align-items: stretch;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            height: 44px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .ref-zone {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            position: relative;
+            transition: all 0.4s;
+        }
+
+        .ref-zone.zone-normal {
+            background: var(--normal-soft);
+            color: var(--normal);
+        }
+
+        .ref-zone.zone-risk {
+            background: var(--risk-soft);
+            color: var(--risk);
+        }
+
+        .ref-zone.zone-danger {
+            background: var(--danger-soft);
+            color: var(--danger);
+        }
+
+        .ref-zone.active {
+            flex: 1.5;
+        }
+
+        .ref-zone.active.zone-normal {
+            box-shadow: inset 0 0 20px var(--normal-glow);
+        }
+
+        .ref-zone.active.zone-risk {
+            box-shadow: inset 0 0 20px var(--risk-glow);
+        }
+
+        .ref-zone.active.zone-danger {
+            box-shadow: inset 0 0 20px var(--danger-glow);
+        }
+
+        .ref-pointer {
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid white;
+            display: none;
+        }
+
+        .ref-zone.active .ref-pointer {
+            display: block;
+        }
+
+        .chart-section {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .chart-section .card {
+            padding: 20px 20px 16px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .chart-legends {
+            display: flex;
+            gap: 14px;
+        }
+
+        .chart-legend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        #chart {
+            width: 100%;
+            height: 240px;
+            display: block;
+            border-radius: 10px;
+        }
+
+        .keyboard-hint {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        kbd {
+            padding: 3px 8px;
+            border-radius: 5px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-mid);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 2px;
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 32px 20px;
+            border: 2px solid transparent;
+            border-radius: 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: 16px;
+        }
+
+        .action-btn:active::before {
+            opacity: 1;
+        }
+
+        .btn-yes {
+            background: var(--normal-soft);
+            color: var(--normal);
+            border-color: rgba(0, 230, 118, 0.15);
+        }
+
+        .btn-yes:hover {
+            background: rgba(0, 230, 118, 0.2);
+            border-color: var(--normal);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(0, 230, 118, 0.2);
+        }
+
+        .btn-yes::before {
+            background: radial-gradient(circle, rgba(0, 230, 118, 0.25), transparent 70%);
+        }
+
+        .btn-yes:active {
+            transform: scale(0.97) translateY(0);
+        }
+
+        .btn-no {
+            background: var(--danger-soft);
+            color: var(--danger);
+            border-color: rgba(255, 23, 68, 0.15);
+        }
+
+        .btn-no:hover {
+            background: rgba(255, 23, 68, 0.2);
+            border-color: var(--danger);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(255, 23, 68, 0.2);
+        }
+
+        .btn-no::before {
+            background: radial-gradient(circle, rgba(255, 23, 68, 0.25), transparent 70%);
+        }
+
+        .btn-no:active {
+            transform: scale(0.97) translateY(0);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .result-card {
+            text-align: center;
+            padding: 40px 32px;
+            margin-bottom: 20px;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card.visible {
+            display: block;
+            animation: resultAppear 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes resultAppear {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .result-card.result-normal::before {
+            background: radial-gradient(ellipse at center, var(--normal-soft), transparent 60%);
+        }
+
+        .result-card.result-risk::before {
+            background: radial-gradient(ellipse at center, var(--risk-soft), transparent 60%);
+        }
+
+        .result-card.result-danger::before {
+            background: radial-gradient(ellipse at center, var(--danger-soft), transparent 60%);
+        }
+
+        .result-header-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .result-vpt {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: -3px;
+            line-height: 1;
+            margin: 8px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-vpt-unit {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .result-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 28px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 1rem;
+            margin: 20px 0 10px;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-status-badge.normal {
+            background: var(--normal-soft);
+            color: var(--normal);
+            border: 1px solid rgba(0, 230, 118, 0.25);
+        }
+
+        .result-status-badge.risk {
+            background: var(--risk-soft);
+            color: var(--risk);
+            border: 1px solid rgba(255, 171, 0, 0.25);
+        }
+
+        .result-status-badge.danger {
+            background: var(--danger-soft);
+            color: var(--danger);
+            border: 1px solid rgba(255, 23, 68, 0.25);
+        }
+
+        .result-advice {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 8px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .result-reversals {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .rev-chip {
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-mid);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+
+        .restart-btn {
+            margin-top: 24px;
+            padding: 14px 36px;
+            border: 1px solid var(--border-mid);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .restart-btn:hover {
+            border-color: var(--accent-blue);
+            background: rgba(68, 138, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .log-card {
+            margin-bottom: 20px;
+        }
+
+        .log-entries {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.72rem;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .log-entries::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .log-entries::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .log-entries::-webkit-scrollbar-thumb {
+            background: var(--border-mid);
+            border-radius: 3px;
+        }
+
+        .log-entry {
+            padding: 1px 0;
+            transition: color 0.2s;
+        }
+
+        .log-entry.rev {
+            color: var(--accent-purple);
+            font-weight: 700;
+        }
+
+        .log-entry.yes {
+            color: var(--normal);
+        }
+
+        .log-entry.no {
+            color: var(--danger);
+        }
+
+        .log-entry.info {
+            color: var(--accent-cyan);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 32px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 14px 16px;
+            }
+
+            .main {
+                padding: 16px 14px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .result-vpt {
+                font-size: 3.5rem;
+            }
+
+            .action-btn {
+                padding: 24px 16px;
+                font-size: 1.2rem;
+            }
+
+            .unit-badge {
+                display: none;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-row .card {
+            animation: slideIn 0.5s ease backwards;
+        }
+
+        .stats-row .card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .stats-row .card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .stats-row .card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .stats-row .card:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header" id="header">
+        <div class="header-brand">
+            <div class="brand-icon">⚡</div>
+            <div class="brand-text">
+                <h1>VPT Biothesiometer</h1>
+                <p>Vibration Perception Threshold Diagnostic Dashboard</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="unit-badge">UNIT: MICROMETERS (µm)</div>
+            <select id="connMode" class="mode-select">
+                <option value="serial">USB SERIAL</option>
+                <option value="ble">BLUETOOTH</option>
+                <option value="wifi">WIFI (WS)</option>
+            </select>
+            <button class="connect-btn" id="connectBtn" onclick="toggleConnection()">🔌 Connect</button>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Not connected select connection mode and click Connect</span>
+    </div>
+
+    <div class="main">
+        <div class="zone-banner" id="zoneBanner">
+            <span class="zone-icon">🔬</span>
+            <span>Connect device and start test to see live clinical zone</span>
+            <span class="zone-label"></span>
+        </div>
+
+        <div class="start-row">
+            <button class="start-btn" id="startBtn" onclick="sendCommand('S')" disabled>
+                ▶ &nbsp;START VPT TEST
+            </button>
+        </div>
+
+        <div class="stats-row">
+            <div class="card stat-card" id="displacementCard">
+                <div class="card-label">Vibration Displacement</div>
+                <div class="stat-value gradient" id="umValue">0.0</div>
+                <div class="stat-unit">micrometers (µm)</div>
+            </div>
+            <div class="card stat-card">
+                <div class="card-label">Motor Power</div>
+                <div class="stat-value cyan" id="pwrValue">0</div>
+                <div class="stat-unit" id="voltValue">0.00 V · 0 / 255</div>
+            </div>
+            <div class="card stat-card">
+                <div class="card-label">Test Progress</div>
+                <div class="stat-value purple" id="revValue">0 / 5</div>
+                <div class="stat-unit">reversals complete</div>
+                <div class="rev-progress" id="revDots"></div>
+            </div>
+            <div class="card stat-card" id="zoneCard">
+                <div class="card-label">Clinical Assessment</div>
+                <div class="stat-value" id="zoneValue" style="font-size:1.2rem;">NORMAL</div>
+                <div class="stat-unit" id="zoneAdvice">Awaiting test data</div>
+            </div>
+        </div>
+
+        <div class="ref-scale" id="refScale">
+            <div class="ref-zone zone-normal" id="refNormal">
+                <span>✓ NORMAL</span>
+                <span style="font-size:0.6rem;opacity:0.7;">
+                    < 15 µm</span>
+                        <div class="ref-pointer"></div>
+            </div>
+            <div class="ref-zone zone-risk" id="refRisk">
+                <span>⚠ AT RISK</span>
+                <span style="font-size:0.6rem;opacity:0.7;">15 - 25 µm</span>
+                <div class="ref-pointer"></div>
+            </div>
+            <div class="ref-zone zone-danger" id="refDanger">
+                <span>🏥 CONSULT DOCTOR</span>
+                <span style="font-size:0.6rem;opacity:0.7;">> 25 µm</span>
+                <div class="ref-pointer"></div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="card">
+                <div class="chart-header">
+                    <div class="card-label">Live Displacement Graph (µm)</div>
+                    <div class="chart-legends">
+                        <div class="chart-legend">
+                            <div class="legend-dot" style="background:var(--accent-blue)"></div>
+                            Displacement (µm)
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-dot" style="background:var(--accent-purple)"></div>
+                            Reversals
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-dot"
+                                style="background:var(--normal);width:16px;height:2px;border-radius:1px;"></div>
+                            Normal (15 µm)
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-dot"
+                                style="background:var(--risk);width:16px;height:2px;border-radius:1px;"></div>
+                            Risk (25 µm)
+                        </div>
+                    </div>
+                </div>
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+
+        <div class="keyboard-hint">
+            Press <kbd>Y</kbd> for YES (I felt it) · <kbd>N</kbd> for NO (I didn't feel it) · <kbd>S</kbd> to Start
+        </div>
+
+        <div class="btn-row">
+            <button class="action-btn btn-yes" id="yesBtn" onclick="sendCommand('Y')" disabled>
+                ✓ YES
+                <span>I felt the vibration</span>
+            </button>
+            <button class="action-btn btn-no" id="noBtn" onclick="sendCommand('N')" disabled>
+                ✗ NO
+                <span>I didn't feel it</span>
+            </button>
+        </div>
+
+        <div class="card result-card" id="resultCard">
+            <div class="result-header-label">VIBRATION PERCEPTION THRESHOLD</div>
+            <div class="result-vpt" id="resultVPT">0.0</div>
+            <div class="result-vpt-unit">micrometers (µm)</div>
+            <div class="result-status-badge" id="resultStatus">NORMAL</div>
+            <div class="result-advice" id="resultAdvice"></div>
+            <div class="result-reversals" id="resultRevs"></div>
+            <button class="restart-btn" onclick="sendCommand('R')">↻ Run Another Test</button>
+        </div>
+
+        <div class="card log-card">
+            <div class="card-label">Test Log</div>
+            <div class="log-entries" id="logEntries">
+                <div class="log-entry info">Biothesiometer Dashboard v7.0 Power-to-Displacement Mapping Active</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        VPT Biothesiometer Clinical Diagnostic Tool All readings in micrometers (µm)
+    </div>
+
+    <script>
+        function calibrateUm(power) {
+            let mapped = power - 20.0;
+            if (mapped < 0) mapped = 0.0;
+            return mapped;
+        }
+
+        let currentMode = 'serial';
+        let isConnected = false;
+        let testRunning = false;
+        let buffer = '';
+
+        let port = null, reader = null, writer = null;
+        let bleDevice = null, bleTx = null, bleRx = null;
+        const UART_SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+        const UART_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+        const UART_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+        let wsConnection = null;
+
+        const chartData = [];
+        const reversalMarkers = [];
+        const MAX_CHART_POINTS = 100;
+        let peakUm = 0, totalReadings = 0, sumUm = 0;
+        let reversalPowers = [];
+
+        const connectBtn = document.getElementById('connectBtn');
+        const modeSelect = document.getElementById('connMode');
+        const startBtn = document.getElementById('startBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const umValue = document.getElementById('umValue');
+        const pwrValue = document.getElementById('pwrValue');
+        const voltValue = document.getElementById('voltValue');
+        const revValue = document.getElementById('revValue');
+        const revDots = document.getElementById('revDots');
+        const zoneBanner = document.getElementById('zoneBanner');
+        const zoneValue = document.getElementById('zoneValue');
+        const zoneAdvice = document.getElementById('zoneAdvice');
+        const displacementCard = document.getElementById('displacementCard');
+        const resultCard = document.getElementById('resultCard');
+        const resultVPT = document.getElementById('resultVPT');
+        const resultStatus = document.getElementById('resultStatus');
+        const resultAdvice = document.getElementById('resultAdvice');
+        const resultRevs = document.getElementById('resultRevs');
+        const logEntries = document.getElementById('logEntries');
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+        const refNormal = document.getElementById('refNormal');
+        const refRisk = document.getElementById('refRisk');
+        const refDanger = document.getElementById('refDanger');
+
+        for (let i = 0; i < 5; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'rev-dot';
+            dot.id = `rev-dot-${i}`;
+            revDots.appendChild(dot);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            const key = e.key.toUpperCase();
+            if (key === 'Y' && testRunning) sendCommand('Y');
+            if (key === 'N' && testRunning) sendCommand('N');
+            if (key === 'S' && !testRunning && isConnected) sendCommand('S');
+        });
+
+        async function toggleConnection() {
+            if (isConnected) await disconnect();
+            else await connect();
+        }
+
+        async function connect() {
+            currentMode = modeSelect.value;
+            statusText.textContent = `Connecting via ${currentMode.toUpperCase()}...`;
+
+            try {
+                if (currentMode === 'serial') {
+                    await connectSerial();
+                } else if (currentMode === 'ble') {
+                    await connectBLE();
+                } else if (currentMode === 'wifi') {
+                    await connectWiFi();
+                }
+
+                isConnected = true;
+                connectBtn.textContent = '⏏ Disconnect';
+                connectBtn.classList.add('connected');
+                statusDot.classList.add('connected');
+                statusText.textContent = `Connected via ${currentMode.toUpperCase()}`;
+                startBtn.disabled = false;
+                modeSelect.disabled = true;
+                addLog(`✓ Connected to device via ${currentMode.toUpperCase()}`, 'info');
+
+            } catch (e) {
+                addLog(`✗ ${currentMode.toUpperCase()} Connection failed: ` + e.message, 'no');
+                statusText.textContent = 'Connection failed ' + e.message;
+            }
+        }
+
+        async function disconnect() {
+            try {
+                if (currentMode === 'serial') {
+                    if (reader) { await reader.cancel(); reader.releaseLock(); reader = null; }
+                    if (writer) { writer.releaseLock(); writer = null; }
+                    if (port) { await port.close(); port = null; }
+                } else if (currentMode === 'ble') {
+                    if (bleDevice && bleDevice.gatt.connected) bleDevice.gatt.disconnect();
+                } else if (currentMode === 'wifi') {
+                    if (wsConnection) wsConnection.close();
+                }
+            } catch (e) { }
+
+            isConnected = false;
+            testRunning = false;
+            connectBtn.textContent = '🔌 Connect';
+            connectBtn.classList.remove('connected');
+            statusDot.classList.remove('connected');
+            statusText.textContent = 'Disconnected';
+            startBtn.disabled = true;
+            yesBtn.disabled = true;
+            noBtn.disabled = true;
+            modeSelect.disabled = false;
+            addLog('Disconnected from device');
+        }
+
+        async function connectSerial() {
+            if (!navigator.serial) throw new Error("Web Serial not supported on this browser or device.");
+            port = await navigator.serial.requestPort();
+            await port.open({ baudRate: 115200 });
+            reader = port.readable.getReader();
+            writer = port.writable.getWriter();
+            readLoopSerial();
+        }
+
+        async function readLoopSerial() {
+            const decoder = new TextDecoder();
+            try {
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    processBuffer();
+                }
+            } catch (e) {
+                if (isConnected) { addLog('Serial read error: ' + e.message, 'no'); disconnect(); }
+            }
+        }
+
+        async function connectBLE() {
+            if (!navigator.bluetooth) throw new Error("Web Bluetooth not supported.");
+            bleDevice = await navigator.bluetooth.requestDevice({
+                filters: [{ services: [UART_SERVICE] }]
+            });
+            const server = await bleDevice.gatt.connect();
+            const service = await server.getPrimaryService(UART_SERVICE);
+            bleTx = await service.getCharacteristic(UART_TX);
+            bleRx = await service.getCharacteristic(UART_RX);
+
+            await bleRx.startNotifications();
+            bleRx.addEventListener('characteristicvaluechanged', handleBleData);
+            bleDevice.addEventListener('gattserverdisconnected', () => {
+                if (isConnected) { addLog("BLE Disconnected", "no"); disconnect(); }
+            });
+        }
+
+        function handleBleData(event) {
+            const decoder = new TextDecoder('utf-8');
+            buffer += decoder.decode(event.target.value);
+            processBuffer();
+        }
+
+        async function connectWiFi() {
+            return new Promise((resolve, reject) => {
+                let targetIP = location.hostname;
+                if (!targetIP || targetIP === '' || targetIP === 'localhost') {
+                    targetIP = prompt("Enter Arduino IP Address", "192.168.4.1");
+                }
+                if (!targetIP) return reject(new Error("No IP provided"));
+
+                wsConnection = new WebSocket(`ws://${targetIP}:81/`);
+                wsConnection.onopen = () => resolve();
+                wsConnection.onerror = (err) => reject(new Error("WebSocket Error. Are you on the Arduino WiFi?"));
+
+                wsConnection.onmessage = (event) => {
+                    buffer += event.data;
+                    processBuffer();
+                };
+                wsConnection.onclose = () => {
+                    if (isConnected) { addLog("WiFi Disconnected", "no"); disconnect(); }
+                };
+            });
+        }
+
+        async function sendCommand(cmd) {
+            if (!isConnected) return;
+            try {
+                const payload = cmd + '\n';
+                const encoder = new TextEncoder();
+
+                if (currentMode === 'serial' && writer) {
+                    await writer.write(encoder.encode(payload));
+                } else if (currentMode === 'ble' && bleTx) {
+                    await bleTx.writeValue(encoder.encode(payload));
+                } else if (currentMode === 'wifi' && wsConnection) {
+                    wsConnection.send(payload);
+                }
+
+                if (cmd === 'S') {
+                    testRunning = true; yesBtn.disabled = false; noBtn.disabled = false; startBtn.disabled = true;
+                    resultCard.classList.remove('visible'); resultCard.className = 'card result-card';
+                    chartData.length = 0; reversalMarkers.length = 0; peakUm = 0; totalReadings = 0; sumUm = 0;
+                    reversalPowers = [];
+                    resetRevDots(); addLog('▶ Test started respond YES or NO', 'info');
+                } else if (cmd === 'Y') {
+                    addLog(' YES Patient felt vibration', 'yes');
+                } else if (cmd === 'N') {
+                    addLog(' NO Patient did NOT feel vibration', 'no');
+                } else if (cmd === 'R') {
+                    testRunning = false; startBtn.disabled = false; yesBtn.disabled = true; noBtn.disabled = true;
+                    resultCard.classList.remove('visible'); resultCard.className = 'card result-card';
+                    chartData.length = 0; reversalMarkers.length = 0; peakUm = 0; totalReadings = 0; sumUm = 0;
+                    reversalPowers = [];
+                    resetRevDots(); resetZone();
+                    umValue.textContent = '0.0'; pwrValue.textContent = '0'; voltValue.textContent = '0.00 V · 0 / 255';
+                    revValue.textContent = '0 / 5'; zoneValue.textContent = 'NORMAL'; zoneAdvice.textContent = 'Awaiting data';
+                    addLog('↻ Test reset ready', 'info');
+                }
+            } catch (e) {
+                addLog('Send error: ' + e.message, 'no');
+            }
+        }
+
+        function processBuffer() {
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                try {
+                    const data = JSON.parse(trimmed);
+                    handleData(data);
+                } catch (e) {
+                    if (trimmed.length > 2) addLog(trimmed);
+                }
+            }
+        }
+
+        function handleData(data) {
+            switch (data.t) {
+                case 'hw':
+                    statusText.textContent = `Hardware OLED ${data.oled ? '✓' : '✗'} ADXL345 ${data.accel ? '✓' : '✗'} ${data.freq || 235}Hz Max PWR ${data.maxPwr}`;
+                    addLog(`Hardware initialized OLED: ${data.oled ? 'OK' : 'FAIL'} Accel: ${data.accel ? 'OK' : 'FAIL'}`, 'info');
+                    break;
+                case 'status':
+                    statusText.textContent = data.msg;
+                    addLog(data.msg, 'info');
+                    if (data.msg.includes('Ready') || data.msg.includes('Reset')) {
+                        testRunning = false; startBtn.disabled = false; yesBtn.disabled = true; noBtn.disabled = true;
+                    }
+                    break;
+                case 'pong':
+                    statusText.textContent = `Heartbeat OK state: ${data.state}`;
+                    break;
+                case 'live':
+                    data.um = calibrateUm(data.pwr);
+                    if (data.pwr <= 35) data.zone = 'NORMAL';
+                    else if (data.pwr <= 45) data.zone = 'AT RISK';
+                    else data.zone = 'CONSULT DOCTOR';
+                    updateLiveData(data);
+                    break;
+                case 'rev':
+                    reversalPowers.push(data.pwr);
+                    data.um = calibrateUm(data.pwr);
+                    addLog(`REVERSAL #${data.n} at ${data.um.toFixed(2)} µm`, 'rev');
+                    reversalMarkers.push({ index: chartData.length - 1, um: data.um, n: data.n });
+                    const dot = document.getElementById(`rev-dot-${data.n - 1}`);
+                    if (dot) dot.classList.add('filled');
+                    break;
+                case 'done':
+                    testRunning = false; yesBtn.disabled = true; noBtn.disabled = true; startBtn.disabled = true;
+
+                    let sumPwr = 0;
+                    for (let p of reversalPowers) sumPwr += p;
+                    let avgPwr = reversalPowers.length > 0 ? (sumPwr / reversalPowers.length) : 0;
+
+                    data.vpt = calibrateUm(avgPwr);
+
+                    if (avgPwr <= 35) data.status = 'NORMAL';
+                    else if (avgPwr <= 45) data.status = 'AT RISK';
+                    else data.status = 'CONSULT DOCTOR';
+
+                    if (data.revs && Array.isArray(data.revs)) {
+                        for (let i = 0; i < data.revs.length; i++) {
+                            let pwrRev = reversalPowers[i] || 0;
+                            data.revs[i] = calibrateUm(pwrRev);
+                        }
+                    }
+                    showResult(data);
+                    addLog(`TEST COMPLETE VPT: ${data.vpt.toFixed(2)} µm STATUS: ${data.status}`, 'rev');
+                    break;
+            }
+        }
+
+        function updateLiveData(data) {
+            umValue.textContent = data.um.toFixed(1);
+            totalReadings++; sumUm += data.um; if (data.um > peakUm) peakUm = data.um;
+            pwrValue.textContent = data.pwr;
+
+            let volts = data.v !== undefined ? data.v : ((data.pwr / 255.0) * 5.0);
+            voltValue.textContent = `${volts.toFixed(2)} V · ${data.pwr} / 255`;
+            revValue.textContent = `${data.rev} / ${data.maxRev}`;
+            updateZone(data.um, data.zone);
+
+            chartData.push(data.um);
+            if (chartData.length > MAX_CHART_POINTS) chartData.shift();
+            drawChart();
+        }
+
+        function updateZone(um, zone) {
+            zoneBanner.className = 'zone-banner';
+            refNormal.classList.remove('active'); refRisk.classList.remove('active'); refDanger.classList.remove('active');
+
+            if (zone === 'NORMAL') {
+                zoneBanner.classList.add('normal');
+                zoneBanner.innerHTML = '<span class="zone-icon">✓</span><span>NORMAL Healthy vibration sensitivity</span><span class="zone-label">< 15 µm</span>';
+                zoneValue.textContent = 'NORMAL'; zoneValue.style.color = 'var(--normal)'; zoneAdvice.textContent = 'Sensitivity is healthy';
+                refNormal.classList.add('active'); displacementCard.style.borderColor = 'rgba(0, 230, 118, 0.25)';
+            } else if (zone === 'AT RISK') {
+                zoneBanner.classList.add('risk');
+                zoneBanner.innerHTML = '<span class="zone-icon">⚠️</span><span>AT RISK Reduced sensitivity detected</span><span class="zone-label">15 - 25 µm</span>';
+                zoneValue.textContent = 'AT RISK'; zoneValue.style.color = 'var(--risk)'; zoneAdvice.textContent = 'Monitor closely';
+                refRisk.classList.add('active'); displacementCard.style.borderColor = 'rgba(255, 171, 0, 0.25)';
+            } else {
+                zoneBanner.classList.add('danger');
+                zoneBanner.innerHTML = '<span class="zone-icon">🏥</span><span>CONSULT DOCTOR Significant impairment</span><span class="zone-label">> 25 µm</span>';
+                zoneValue.textContent = 'CONSULT DOCTOR'; zoneValue.style.color = 'var(--danger)'; zoneAdvice.textContent = 'Specialist evaluation needed';
+                refDanger.classList.add('active'); displacementCard.style.borderColor = 'rgba(255, 23, 68, 0.25)';
+            }
+        }
+
+        function resetZone() {
+            zoneBanner.className = 'zone-banner';
+            zoneBanner.innerHTML = '<span class="zone-icon">🔬</span><span>Connect device and start test to see live clinical zone</span>';
+            refNormal.classList.remove('active'); refRisk.classList.remove('active'); refDanger.classList.remove('active');
+            displacementCard.style.borderColor = '';
+        }
+
+        function showResult(data) {
+            resultVPT.textContent = data.vpt.toFixed(1);
+            const badge = resultStatus;
+            const status = data.status;
+
+            if (status === 'NORMAL') {
+                badge.textContent = '✓ NORMAL'; badge.className = 'result-status-badge normal';
+                resultVPT.style.color = 'var(--normal)'; resultCard.className = 'card result-card result-normal';
+                resultAdvice.innerHTML = `<strong>Great news</strong> Your vibration perception threshold of <strong>${data.vpt.toFixed(1)} µm</strong> is within the healthy range (< 15 µm).<br>No signs of peripheral neuropathy detected. No further action required.`;
+            } else if (status === 'AT RISK') {
+                badge.textContent = '⚠ AT RISK'; badge.className = 'result-status-badge risk';
+                resultVPT.style.color = 'var(--risk)'; resultCard.className = 'card result-card result-risk';
+                resultAdvice.innerHTML = `<strong>Attention</strong> Your VPT of <strong>${data.vpt.toFixed(1)} µm</strong> indicates early signs of reduced vibration sensitivity (15 - 25 µm range).<br>We recommend monitoring closely and retesting in <strong>3 months</strong>. Consult your physician if symptoms worsen.`;
+            } else {
+                badge.textContent = '🏥 CONSULT DOCTOR'; badge.className = 'result-status-badge danger';
+                resultVPT.style.color = 'var(--danger)'; resultCard.className = 'card result-card result-danger';
+                resultAdvice.innerHTML = `<strong>Important</strong> Your VPT of <strong>${data.vpt.toFixed(1)} µm</strong> shows significant loss of vibration sensitivity (> 25 µm).<br><strong>Please consult a neurologist or specialist</strong> for comprehensive peripheral neuropathy evaluation and treatment options.`;
+            }
+
+            resultRevs.innerHTML = '';
+            if (data.revs && Array.isArray(data.revs)) {
+                data.revs.forEach((v, i) => {
+                    const chip = document.createElement('span'); chip.className = 'rev-chip';
+                    chip.textContent = `R${i + 1}: ${v.toFixed(1)} µm`; resultRevs.appendChild(chip);
+                });
+            }
+            resultCard.classList.add('visible');
+        }
+
+        function resetRevDots() {
+            for (let i = 0; i < 5; i++) {
+                const d = document.getElementById(`rev-dot-${i}`);
+                if (d) d.classList.remove('filled');
+            }
+        }
+
+        function drawChart() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const w = rect.width - 40; const h = 240;
+            canvas.width = w * dpr; canvas.height = h * dpr;
+            canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+            ctx.scale(dpr, dpr); ctx.clearRect(0, 0, w, h);
+
+            if (chartData.length < 2) {
+                ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = '500 13px Inter'; ctx.textAlign = 'center';
+                ctx.fillText('Waiting for live data...', w / 2, h / 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.font = '400 11px Inter';
+                ctx.fillText('Values displayed in micrometers (µm)', w / 2, h / 2 + 22);
+                return;
+            }
+
+            const padL = 52, padR = 14, padT = 14, padB = 32;
+            const plotW = w - padL - padR; const plotH = h - padT - padB;
+
+            let yMin = Infinity, yMax = -Infinity;
+            for (const v of chartData) { if (v < yMin) yMin = v; if (v > yMax) yMax = v; }
+            yMin = Math.min(yMin, 10); yMax = Math.max(yMax, 30);
+            const yRange = yMax - yMin; yMin = Math.max(0, yMin - yRange * 0.08); yMax = yMax + yRange * 0.08;
+
+            const normalY = padT + plotH - ((15 - yMin) / (yMax - yMin)) * plotH;
+            const riskY = padT + plotH - ((25 - yMin) / (yMax - yMin)) * plotH;
+
+            if (15 > yMin) { ctx.fillStyle = 'rgba(0, 230, 118, 0.03)'; ctx.fillRect(padL, Math.max(padT, normalY), plotW, padT + plotH - Math.max(padT, normalY)); }
+            ctx.fillStyle = 'rgba(255, 171, 0, 0.03)';
+            const riskTop = Math.max(padT, riskY); const riskBot = Math.min(padT + plotH, normalY);
+            if (riskBot > riskTop) { ctx.fillRect(padL, riskTop, plotW, riskBot - riskTop); }
+            if (25 < yMax) { ctx.fillStyle = 'rgba(255, 23, 68, 0.03)'; ctx.fillRect(padL, padT, plotW, Math.min(plotH, riskY - padT)); }
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 1;
+            const ySteps = 6;
+            for (let i = 0; i <= ySteps; i++) {
+                const y = padT + (plotH / ySteps) * i;
+                ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
+                const val = yMax - ((yMax - yMin) / ySteps) * i;
+                ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '500 10px Inter'; ctx.textAlign = 'right';
+                ctx.fillText(val.toFixed(1), padL - 8, y + 4);
+            }
+
+            ctx.save(); ctx.translate(10, padT + plotH / 2); ctx.rotate(-Math.PI / 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = '600 9px Inter'; ctx.textAlign = 'center';
+            ctx.fillText('MICROMETERS (µm)', 0, 0); ctx.restore();
+
+            function drawThreshold(val, color, label) {
+                if (val >= yMin && val <= yMax) {
+                    const y = padT + plotH - ((val - yMin) / (yMax - yMin)) * plotH;
+                    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+                    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.font = '600 9px Inter'; const textW = ctx.measureText(label).width;
+                    ctx.fillStyle = 'rgba(5, 5, 16, 0.8)'; ctx.fillRect(w - padR - textW - 12, y - 12, textW + 8, 16);
+                    ctx.fillStyle = color; ctx.textAlign = 'right'; ctx.fillText(label, w - padR - 8, y - 2);
+                }
+            }
+            drawThreshold(15.0, 'rgba(0, 230, 118, 0.6)', 'NORMAL < 15 µm');
+            drawThreshold(25.0, 'rgba(255, 171, 0, 0.6)', 'RISK > 25 µm');
+
+            const xStep = plotW / (MAX_CHART_POINTS - 1); const offset = MAX_CHART_POINTS - chartData.length;
+
+            const glowGrad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+            glowGrad.addColorStop(0, 'rgba(68, 138, 255, 0.4)'); glowGrad.addColorStop(0.5, 'rgba(100, 120, 255, 0.3)'); glowGrad.addColorStop(1, 'rgba(124, 77, 255, 0.4)');
+            ctx.strokeStyle = glowGrad; ctx.lineWidth = 6; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            for (let i = 0; i < chartData.length; i++) {
+                const x = padL + (offset + i) * xStep; const y = padT + plotH - ((chartData[i] - yMin) / (yMax - yMin)) * plotH;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke(); ctx.globalAlpha = 1;
+
+            const lineGrad = ctx.createLinearGradient(padL, 0, w - padR, 0);
+            lineGrad.addColorStop(0, '#448aff'); lineGrad.addColorStop(0.5, '#6366f1'); lineGrad.addColorStop(1, '#7c4dff');
+            ctx.strokeStyle = lineGrad; ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i < chartData.length; i++) {
+                const x = padL + (offset + i) * xStep; const y = padT + plotH - ((chartData[i] - yMin) / (yMax - yMin)) * plotH;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            const lastIdx = chartData.length - 1; const lastX = padL + (offset + lastIdx) * xStep;
+            ctx.lineTo(lastX, padT + plotH); ctx.lineTo(padL + offset * xStep, padT + plotH); ctx.closePath();
+            const fillGrad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+            fillGrad.addColorStop(0, 'rgba(68, 138, 255, 0.12)'); fillGrad.addColorStop(0.5, 'rgba(99, 102, 241, 0.06)'); fillGrad.addColorStop(1, 'rgba(124, 77, 255, 0.01)');
+            ctx.fillStyle = fillGrad; ctx.fill();
+
+            const lastPx = padL + (offset + lastIdx) * xStep; const lastPy = padT + plotH - ((chartData[lastIdx] - yMin) / (yMax - yMin)) * plotH;
+
+            ctx.beginPath(); ctx.arc(lastPx, lastPy, 8, 0, Math.PI * 2); ctx.fillStyle = 'rgba(68, 138, 255, 0.2)'; ctx.fill();
+            ctx.beginPath(); ctx.arc(lastPx, lastPy, 4, 0, Math.PI * 2); ctx.fillStyle = '#448aff'; ctx.fill();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+
+            ctx.fillStyle = 'rgba(5, 5, 16, 0.85)'; ctx.strokeStyle = 'rgba(68, 138, 255, 0.5)'; ctx.lineWidth = 1;
+            const valText = chartData[lastIdx].toFixed(1) + ' µm'; const valTextW = ctx.measureText(valText).width;
+            const labelX = lastPx - valTextW / 2 - 6; const labelY = lastPy - 20;
+            ctx.beginPath(); roundRect(ctx, labelX, labelY - 10, valTextW + 12, 18, 5); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 10px Inter'; ctx.textAlign = 'center'; ctx.fillText(valText, lastPx, labelY + 2);
+
+            for (const m of reversalMarkers) {
+                const adjustedIdx = m.index - (chartData.length > MAX_CHART_POINTS ? chartData.length - MAX_CHART_POINTS : 0);
+                if (adjustedIdx < 0 || adjustedIdx >= chartData.length) continue;
+                const x = padL + (offset + adjustedIdx) * xStep; const y = padT + plotH - ((m.um - yMin) / (yMax - yMin)) * plotH;
+
+                ctx.beginPath(); ctx.moveTo(x, y - 7); ctx.lineTo(x + 5, y); ctx.lineTo(x, y + 7); ctx.lineTo(x - 5, y); ctx.closePath();
+                ctx.fillStyle = '#7c4dff'; ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+                ctx.fillStyle = 'rgba(5, 5, 16, 0.8)'; const rlabel = `R${m.n}`; const rlabelW = ctx.measureText(rlabel).width;
+                ctx.fillRect(x - rlabelW / 2 - 4, y - 22, rlabelW + 8, 14);
+                ctx.fillStyle = '#c4b5fd'; ctx.font = 'bold 9px Inter'; ctx.textAlign = 'center'; ctx.fillText(rlabel, x, y - 12);
+            }
+            ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = '500 10px Inter'; ctx.textAlign = 'center'; ctx.fillText('Time readings →', w / 2, h - 6);
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+        }
+
+        function addLog(msg, cls = '') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry' + (cls ? ' ' + cls : '');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            entry.textContent = `[${time}] ${msg}`;
+            logEntries.appendChild(entry);
+            logEntries.scrollTop = logEntries.scrollHeight;
+            while (logEntries.children.length > 100) logEntries.removeChild(logEntries.firstChild);
+        }
+
+        window.addEventListener('resize', () => { if (chartData.length >= 2) drawChart(); });
+        drawChart();
+    </script>
+</body>
+
+</html>
