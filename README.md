@@ -16,7 +16,7 @@ Automated Patient Testing: uses a modified Békésy tracking algorithm to measur
 
 
 System Pin Configuration
-Pin C	12	Write to the command register.
+Pin C	12	
 LRA Motor Line 1	9	H-Bridge Driver Input A
 LRA Motor Line 2	10	H-Bridge Driver Input B
 SDA	SDA	I2C Data Line
