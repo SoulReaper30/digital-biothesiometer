@@ -8,8 +8,8 @@ Vibration Generation: Using a Linear Resonant Actuator (LRA) to generate targete
 **Closed-Loop Feedback Control**
 <img width="1280" height="960" alt="WhatsApp Image 2026-05-04 at 13 15 00" src="https://github.com/user-attachments/assets/0404c975-95d5-4c02-b724-c3ebf00ccb37" />
 
-**
-Key Features**
+
+**Key Features**
 Decentralized Access: Low-cost components enable reliable neurological screening beyond large hospital networks.
 
 Continuous acceleration monitoring prevents errors due to different thicknesses of skin (Callus Deflection Compensation).
@@ -46,7 +46,7 @@ Adafruit_ADXL345_U
 
 Adafruit_Sensor
 
-Performing a diagnostic procedure
+**Performing a diagnostic procedure**
 1. Program the Arduino with the new firmware.
 2. Open your desktop terminal or Serial Monitor at a baud rate of 115200.
 3. Use the terminal interface to send the designated start command (31A) to start the motor control loop.
