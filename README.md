@@ -2,36 +2,52 @@ This project presents a portable, extremely affordable Digital Biothesiometer sy
 
 Hardware Architecture
 This device is based on an Arduino Uno R4 microcontroller with a custom built probe designed for a handheld controller.
+
 Vibration Generation: Using a Linear Resonant Actuator (LRA) to generate targeted vibrations at 235Hz. This frequency in particular activates the main mechanoreceptors in human skin, namely the Meissner corpuscles.
+
 Closed-Loop Feedback Control
-<img width="1024" height="768" alt="3D207CF3-122B-46E1-8EA7-655EDAF0EA11_1_105_c" src="https://github.com/user-attachments/assets/905a19d6-5dc4-4219-a5ea-5d3454e1990a" />
+<img width="1280" height="960" alt="WhatsApp Image 2026-05-04 at 13 15 00" src="https://github.com/user-attachments/assets/0404c975-95d5-4c02-b724-c3ebf00ccb37" />
 
 
 Key Features
 Decentralized Access: Low-cost components enable reliable neurological screening beyond large hospital networks.
+
 Continuous acceleration monitoring prevents errors due to different thicknesses of skin (Callus Deflection Compensation).
+
 Pre-Ulcer Screening: The tracking software identifies sensory degradation 6-12 months prior to physical ulcers developing on the skin.
+
 Automated Patient Testing: uses a modified Békésy tracking algorithm to measure the exact point of transition between physical sensation and its loss.
-<img width="1024" height="768" alt="EC2BF34B-7763-43E1-9254-5BB6FB8E9B3C_1_105_c" src="https://github.com/user-attachments/assets/5798eb03-404b-4183-8703-b9d842d987ba" />
+<img width="1024" height="768" alt="EC2BF34B-7763-43E1-9254-5BB6FB8E9B3C_1_105_c" src="https://github.com/user-attachments/assets/0672e846-9dab-4f50-8688-d1f283f19426" />
 
 
 System Pin Configuration
-Pin C	12	
-LRA Motor Line 1	9	H-Bridge Driver Input A
-LRA Motor Line 2	10	H-Bridge Driver Input B
-SDA	SDA	I2C Data Line
-ADXL345 SCL	SCL	I2C Clock Line
+Pin C: 12
+
+LRA Motor Line 1: 9 (H-Bridge Driver Input A)
+
+LRA Motor Line 2: 10 (H-Bridge Driver Input B)
+
+SDA: SDA (I2C Data Line)
+
+ADXL345 SCL: SCL (I2C Clock Line)
+
 The I2C Data Bus is shared between SH1106 OLED and SDA.
-Shared I2C Clock Bus: SH1106 OLED SCL	SCL
+Shared I2C Clock Bus: SH1106 OLED SCL SCL
+
 Firmware Installation
 Library Dependencies
 Install these libraries using your Arduino Library Manager BEFORE compiling the code:
-•	Wire
-•	Adafruit_SH110X
-•	Adafruit_ADXL345_U
-•	Adafruit_Sensor
+
+Wire
+
+Adafruit_SH110X
+
+Adafruit_ADXL345_U
+
+Adafruit_Sensor
+
 Performing a diagnostic procedure
-	2.	Program the Arduino with the new firmware.
-	2.	Open your desktop terminal or Serial Monitor at a baud rate of 115200.
-	3.	Use the terminal interface to send the designated start command (31A) to start the motor control loop.
-	5. Record the user's responses at each power step in the routine using the physical input or serial commands.
+1. Program the Arduino with the new firmware.
+2. Open your desktop terminal or Serial Monitor at a baud rate of 115200.
+3. Use the terminal interface to send the designated start command (31A) to start the motor control loop.
+5. Record the user's responses at each power step in the routine using the physical input or serial commands.
