@@ -52,3 +52,14 @@ Before you compile, download these four libraries from your Arduino Library Mana
 2. As a first, open a terminal or the built-in Serial Monitor at 115200 baud.
 3. To start up the motor control loop, type and send the start command 31A.
 4. Use the serial interface or physical buttons to record the answers at each power level.
+
+
+Item,Model,Qty,Purpose
+Microcontroller,Arduino Uno R4 WiFi,1,runs the main code and handles the LED matrix built in
+Accelerometer,Adafruit ADXL345,1,reads the live physical vibrations from the probe
+Display,1.3-inch 128x64 OLED SH1106G,1,shows the live test data and final results
+Motor Driver,DRV8833,1,to power the vibration motor
+Actuator,LRA,1,creates the physical buzzing
+Wiring,Breadboard jumper wires,1 set,Connects all the electronic parts together
+Power Supply,5V 2A USB-C 9V battery and USB-C cable to arduino,1,Keeps the power stable so the motor does not crash the screen
+Mounting,Custom 3D Printed Casing,1,Holds everything together in a single handheld unit
